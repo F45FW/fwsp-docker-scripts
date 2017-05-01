@@ -10,7 +10,6 @@
     "type": "git",
     "url": "git+https://github.com/flywheelsports/docker-scripts.git"
   },
-  "private": true,
   "author": "Eric Adum <eric@flywheelsports.com>",
   "license": "MIT",
   "bugs": {

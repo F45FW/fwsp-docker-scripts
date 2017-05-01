@@ -1,7 +1,6 @@
 const config = require('fwsp-config');
 const fs = require('fs');
 const spawn = require('child_process').spawn;
-const DEFAULT_DOCKER_HUB_ORG = 'flywheelsports';
 
 class DockerScripts {
   constructor(name, version) {
