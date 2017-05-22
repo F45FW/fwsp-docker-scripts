@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const config = require('fwsp-config');
 const fs = require('fs');
 const spawn = require('child_process').spawn;
