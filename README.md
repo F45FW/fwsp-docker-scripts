@@ -10,7 +10,7 @@ and dev dependency (make sure to run npm install after):
 
 ```
   "devDependencies": {
-    "fwsp-docker-scripts": "0.0.1"
+    "fwsp-docker-scripts": "0.0.2"
   }
 ```
 
