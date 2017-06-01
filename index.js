@@ -8,7 +8,9 @@ class DockerScripts {
   constructor(name, version) {
     this.package = { name, version };
     this.modes = {
-      build: () => ['docker', ['build', '-t', this.getTag(), process.cwd()], { stdio: 'inherit' }],
+      build: () => ['docker', ['build', // '--rm', '--no-cache',
+        '--build-arg', `NPM_TOKEN=${process.env.NPM_TOKEN}`,
+        '-t', this.getTag(), process.cwd()], { stdio: 'inherit' }],
       run: () => ['docker', ['run', '-it', this.getTag()], { stdio: 'inherit' }],
       up: () => ['docker', ['run', '-d', this.getTag()], { detached: true }],
       push: () => ['docker', ['push', this.getTag()]]
@@ -17,7 +19,7 @@ class DockerScripts {
   getTag() {
     return `${this.config.organization}/${this.package.name}:${this.package.version}`;
   }
-  getDockerfile(entryPoint, exposePort, logger = false) {
+  getDockerfile(entryPoint, exposePort, packageManager = 'npm') {
     return `
     FROM ${this.config.baseImage}
     MAINTAINER ${this.config.author} ${this.config.email}
@@ -27,8 +29,7 @@ class DockerScripts {
     WORKDIR /usr/src/app
     ADD . /usr/src/app
     RUN echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-    ${logger ? 'RUN npm install pino-elasticsearch -g' : ''}
-    RUN npm install --production
+    RUN ${packageManager} install --production
     RUN rm -f .npmrc
     ENTRYPOINT ["node", "${entryPoint}"]
     `;
@@ -57,6 +58,10 @@ class DockerScripts {
         }
         this.config = config.docker;
         if (mode === 'build') {
+          if (!fs.existsSync('./dockerignore')) {
+            fs.writeFileSync('.dockerignore', 'node_modules/\n');
+            console.log('wrote .dockerignore');
+          }
           if (fs.existsSync('Dockerfile')) {
             console.log('Dockerfile already exists, running docker build...');
             this._run(mode);
@@ -65,9 +70,8 @@ class DockerScripts {
             let Dockerfile = this.getDockerfile(
               config.hydra.serviceName,
               config.hydra.servicePort,
-              config.hydra.plugins && config.hydra.plugins.logger ? true : false
+              fs.existsSync('./yarn.lock') ? 'yarn' : 'npm'
             ).split(/\n/).map(v => v.trim()).filter(v => v.length).join('\n');
-            console.log(Dockerfile);
             fs.writeFile('Dockerfile', Dockerfile, err => {
               if (err) {
                 console.log('Error writing Dockerfile', err);
