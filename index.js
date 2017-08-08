@@ -26,6 +26,7 @@ class DockerScripts {
     EXPOSE ${exposePort}
     ARG NPM_TOKEN
     RUN mkdir -p /usr/src/app
+    HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost:${exposePort}/health || exit 1
     WORKDIR /usr/src/app
     ADD . /usr/src/app
     RUN echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
