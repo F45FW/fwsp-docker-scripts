@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const config = require('fwsp-config');
+const config = require('./config');
 const fs = require('fs');
 const spawn = require('child_process').spawn;
 
@@ -60,7 +60,7 @@ class DockerScripts {
         this.config = config.docker;
         if (mode === 'build') {
           if (!fs.existsSync('./dockerignore')) {
-            fs.writeFileSync('.dockerignore', 'node_modules/\n');
+            fs.writeFileSync('.dockerignore', 'node_modules/\n*.log\n');
             console.log('wrote .dockerignore');
           }
           if (fs.existsSync('Dockerfile')) {
