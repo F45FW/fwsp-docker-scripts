@@ -20,13 +20,14 @@ class DockerScripts {
     return `${this.config.organization}/${this.package.name}:${this.package.version}`;
   }
   getDockerfile(entryPoint, exposePort, packageManager = 'npm') {
+    let rootRoute = entryPoint.substr(0, entryPoint.indexOf('-service'));
     return `
     FROM ${this.config.baseImage}
     MAINTAINER ${this.config.author} ${this.config.email}
     EXPOSE ${exposePort}
     ARG NPM_TOKEN
     RUN mkdir -p /usr/src/app
-    HEALTHCHECK --start-period=10s --interval=30s --timeout=3s CMD curl -f http://localhost:${exposePort}/v1/${entryPoint}/health || exit 1
+    HEALTHCHECK --start-period=10s --interval=30s --timeout=3s CMD curl -f http://localhost:${exposePort}/v1/${rootRoute}/health || exit 1
     WORKDIR /usr/src/app
     ADD . /usr/src/app
     RUN echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
