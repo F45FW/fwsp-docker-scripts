@@ -60,7 +60,7 @@ class DockerScripts {
         }
         this.config = config.docker;
         if (mode === 'build') {
-          if (!fs.existsSync('./dockerignore')) {
+          if (!fs.existsSync('.dockerignore')) {
             fs.writeFileSync('.dockerignore', 'node_modules/\n*.log\n');
             console.log('wrote .dockerignore');
           }
